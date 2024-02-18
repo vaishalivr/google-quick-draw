@@ -1,0 +1,78 @@
+#imageContainer {
+    display: flex;         
+    flex-direction: row;    
+    height: 375px;      
+    padding: 6rem;  
+}
+
+.section {
+    flex: 1;                
+    border: 1px solid black; 
+    box-sizing: border-box;
+    margin: 0.3rem;
+}
+
+.section img {
+   transform: scale(0.75);
+}
+
+#fan {
+    display: none;
+    opacity: 0;
+    transition: opacity 600ms;
+}
+
+#section-one img, #section-two img {
+    opacity: 0; 
+    transform: scale(0.95); 
+    transition: transform 0.3s, opacity 0.3s; 
+}
+
+#section-one.show, #section-two.show  {
+    display: inline-block; 
+}
+
+#section-one.show img {
+    animation: fadeInScaleUp 0.6s ease-in-out forwards;
+}
+
+@keyframes fadeInScaleUp {
+    0% {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeOutScaleDown {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+#section-one.hide img, #section-two.hide img  {
+    opacity: 0;
+    transform: scale(0.95); 
+    animation: fadeOutScaleDown 0.6s ease-in-out forwards;
+}
+
+#section-two.show img {
+    animation: fadeInScaleUp 0.6s ease-in-out forwards;
+    animation-delay: 0.90s; /* 0.6s + 0.30s wait time */
+}
+
+#howToReadData {
+    border: 1px solid black; /* Optional, just to see the SVG boundaries */
+}
+
+#countriesChart {
+    border: 1px solid black;
+}

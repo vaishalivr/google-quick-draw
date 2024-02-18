@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>How Same or Different Are We</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="imagecss.css" />
+  </head>
+  <body>
+    <div class="title-container">
+      <svg width="20%" height="100%" id="svg-side"></svg>
+      <div class="title">
+        <h1><span>How Same or Different</span><br /><span>Are We</span></h1>
+      </div>
+    </div>
+
+    <div class="main-text">
+      <!-- styling in styles.css -->
+      <p>
+        What if you were told to doodle a
+        <span class="tooltip-img custom-underline"
+          >house
+          <span class="tooltiptext">
+            <img src="tooltip_images/tooltip-house.png" alt="House Image" />
+          </span> </span
+        >?
+      </p>
+
+      <p>
+        Or doodle a
+        <span class="tooltip-img custom-underline"
+          >nail
+          <span class="tooltiptext">
+            <img src="tooltip_images/tooltip-nail.png" alt="Nail Image" />
+          </span> </span
+        >?
+      </p>
+      <!-- <p>Or a fan?</p> -->
+
+      <p>
+        Or doodle a
+        <span class="tooltip-img custom-underline"
+          >fan
+          <span class="tooltiptext">
+            <img src="tooltip_images/tooltip-fan.png" alt="Fan Image" />
+          </span> </span
+        >?
+      </p>
+
+      <p>
+        And as I write this, the
+        <span class="tooltip-img custom-underline"
+          >dishwasher
+          <span class="tooltiptext">
+            <img
+              src="tooltip_images/tooltip-dishwasher.png"
+              alt="dishwasher Image"
+            />
+          </span>
+        </span>
+        that comes to your mind may not be the same as the
+        <span class="tooltip-img custom-underline"
+          >dishwasher
+          <span class="tooltiptext">
+            <img
+              src="tooltip_images/tooltip-dishwasher2.png"
+              alt="dishwasher Image"
+            />
+          </span>
+        </span>
+        is someone else’s mind.
+      </p>
+      <p>
+        The
+        <span class="tooltip-img custom-underline"
+          >blackberry
+          <span class="tooltiptext">
+            <img
+              src="tooltip_images/tooltip-blackberry.png"
+              alt="blackberry Image"
+            />
+          </span>
+        </span>
+        that someone ponders about, may not be the same
+        <span class="tooltip-img custom-underline"
+          >blackberry
+          <span class="tooltiptext">
+            <img
+              src="tooltip_images/tooltip-blackberry2.png"
+              alt="blackberry Image"
+            />
+          </span>
+        </span>
+        that was meant.
+      </p>
+      <p>
+        Or a
+        <span class="tooltip-img custom-underline"
+          >leaf
+          <span class="tooltiptext">
+            <img src="tooltip_images/tooltip-leaf1.png" alt="leaf Image" />
+          </span>
+        </span>
+        in Canada may not be the same as the
+        <span class="tooltip-img custom-underline"
+          >leaf
+          <span class="tooltiptext">
+            <img src="tooltip_images/tooltip-leaf.png" alt="leaf Image" />
+          </span>
+        </span>
+        that most people think of.
+      </p>
+      <p>
+        You can <strong><em>hover</em></strong> over the doodles above to see
+        what they actually are.
+      </p>
+      <p>
+        The image that comes to mind when these words are mentioned, has a lot
+        to do with the version of these words we’ve grown up with.
+      </p>
+      <p>
+        Here I attempt to explore the
+        <a
+          href="https://quickdraw.withgoogle.com/"
+          target="_blank"
+          class="custom-underline"
+          >Google's Quick Draw</a
+        >
+        dataset which is the worlds largest published doodle dataset containing
+        50 million drawings belonging to different categories such as an axe, a
+        football, a flower, a zigzag and even the Eiffel Tower. Quick Draw is a
+        game about a neural network learning how to recognize doodles where
+        these doodles are used to advance machine learning research.
+      </p>
+      <p id="one">
+        This story includes datasets that have chances of being different by
+        showing creativity such as:
+      </p>
+      <p id="fan">fan</p>
+      <br />
+      <br />
+    </div>
+    <div id="imageContainer">
+      <div class="section" id="section-one">
+        <img src="fan/fan_5118763739381760.png" />
+        <img src="fan/fan_6120310522773504.png" />
+        <img src="fan/fan_4653003174838272.png" />
+        <img src="fan/fan_6419775301353472.png" />
+        <img src="fan/fan_4742979304554496.png" />
+        <img src="fan/fan_6649359053619200.png" />
+      </div>
+      <div class="section" id="section-two">
+        <img src="flower/flower_6585156003430400.png" />
+        <img src="flower/flower_6294208107249664.png" />
+        <img src="flower/flower_5994608569876480.png" />
+        <img src="flower/flower_4558782921179136.png" />
+        <img src="flower/flower_5468166643777536.png" />
+        <img src="flower/flower_4601697424900096.png" />
+      </div>
+      <div class="section">
+        <img id="tornadoImage" src="tornado.png" />
+      </div>
+      <div class="section">
+        <img id="houseImage" src="house.png" />
+      </div>
+      <div class="section"></div>
+      <div class="section"></div>
+    </div>
+    <div class="main-text">
+      Let's take a look at how the data is interpreted, with a sample data of a
+      house. It looks like:
+    </div>
+    <div class="main-text">
+      {"word":"house","countrycode":"US","timestamp":"2017-03-11 19:09:26.08877
+      UTC","recognized":true,"key_id":"5054419760578560","drawing":[[[9,9,13,19,23,41,62,129,145,164,166,161,141,132,0],[108,212,239,252,255,255,253,236,231,220,189,164,100,85,108]],[[3,3,14,44,63,75,100,135],[107,92,68,22,1,0,16,72]],[[27,22,25,37,60,65,63,22],[157,162,203,210,210,203,148,148]],[[13,49,74],[185,187,184]],[[38,42],[156,212]]]}
+    </div>
+    <div class="main-text">
+      <button id="seeDataButton">See Animation</button>
+      <svg id="howToReadData" width="500" height="300"></svg>
+    </div>
+
+    <div class="main-text">
+      Let's take a look at how many countries got a chance to be a part of this
+      dataset and how do they compare to one another. For statistical validity
+      and reduced bias i'll try random sampling since the dataset is large and
+      well organized using python's random library.
+    </div>
+    <br />
+    <div class="main-text">
+      As we see below, the highest contributor is the
+      <span id="us-underline">United States</span> followed by the second
+      highest contributor of a huge difference the
+      <span id="uk-underline">United Kingdom</span>.
+    </div>
+    <div id="countriesChart" class="main-text"></div>
+    <br />
+    <!-- <div id="countriesChartOption2" class="main-text"></div> -->
+    <div class="main-text">
+      Let's take a look at how people see things differently
+    </div>
+    <div id="master-showcase" style="border: 1px solid black">
+      <img src="brushStroke.webp" id="brushStroke" style="display: none" />
+    </div>
+    <div class="main-text">
+      Vaishali Verma daljfdhaljsdhfal;sdjfhaslkdjfhalkdsjfhaliusdfhacn
+      asdiufhgalisdufhgaisud adifuahsdfiuasdgf asdfiagsdfiasduyfgasdiufha
+      adsiufhasidufhga
+    </div>
+    <script src="data.js"></script>
+    <script src="index.js"></script>
+    <script src="svg2.js"></script>
+    <script src="dataLegend.js"></script>
+    <script src="countriesBarChart.js"></script>
+    <script src="countriesBarChartOption2.js"></script>
+    <script src="masterShowcase.js"></script>
+  </body>
+</html>

@@ -1,0 +1,107 @@
+h1 {
+    margin: 0; 
+    font-size: 3rem;
+}
+
+h1 span {
+    display: block;
+    line-height: 0.75;
+}
+
+.title-container {
+    display: flex;
+    height: 100vh;
+}
+  
+#svg-side{
+    position: absolute;
+}
+  
+.title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    /* border: 3px solid black; */
+    width: 100%; 
+}
+
+.main-text {
+    width: 45%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: justify;
+    line-height: 1.5;
+    font-size: 1.2em;
+}
+
+
+#us-underline, #uk-underline {
+    position: relative;
+    /* line-height: 1; */
+  }
+  
+.custom-underline {
+    text-decoration: none;
+    box-shadow: inset 0 -2px 0 #ffd43c;
+    color: #000;
+}
+
+#us-underline:after {
+    content: '';
+    position: absolute;
+    left: 10px;
+    right: 0px;
+    height: 20px; 
+    background-image: url('red-brush-stroke.png');
+    background-size: cover;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.75;
+    z-index: -1;
+    scale: 1.2;
+}
+
+#uk-underline:after {
+    content: '';
+    position: absolute;
+    left: -10px;
+    right: 0px;
+    height: 20px; 
+    background-image: url('orange-brush-stroke.png');
+    background-size: cover;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.75;
+    z-index: -1;
+    scale: 1.2;
+}
+
+
+/* styling for text tooltip images */
+.tooltip-img {
+    position: relative;
+    display: inline-block;
+    cursor: pointer; 
+  }
+  
+  .tooltip-img .tooltiptext {
+    visibility: hidden;
+    width: 100px; 
+    position: absolute;
+    z-index: 1;
+    bottom: 100%; 
+    left: 50%;
+    margin-left: -50px; 
+  }
+  
+  .tooltip-img:hover .tooltiptext {
+    visibility: visible;
+  }
+  
+  .tooltip-img .tooltiptext img {
+    width: 100%; 
+    height: auto;
+  }
+  
