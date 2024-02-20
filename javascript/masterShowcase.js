@@ -4,12 +4,12 @@ const RECTCOUNTDATA = d3.range(LEGENDRECTCOUNT);
 const RECTSPERROW = LEGENDRECTCOUNT;
 const SVGWIDTH = 1200;
 const imagePaths = {
-  "rect-1": "media/prelim_mastershowcase_tooltips/dishwasher_drawings.png",
-  "rect-2": "media/prelim_mastershowcase_tooltips/blackberry_drawings.png",
-  "rect-3": "media/prelim_mastershowcase_tooltips/cookie_drawings.png",
-  "rect-4": "media/prelim_mastershowcase_tooltips/fan_drawings.png",
-  "rect-5": "media/prelim_mastershowcase_tooltips/mona_drawings.png",
-  "rect-6": "media/prelim_mastershowcase_tooltips/greatWall_drawings.png",
+  // "rect-1": "media/prelim_mastershowcase_tooltips/dishwasher_drawings.png",
+  // "rect-2": "media/prelim_mastershowcase_tooltips/blackberry_drawings.png",
+  // "rect-3": "media/prelim_mastershowcase_tooltips/cookie_drawings.png",
+  // "rect-4": "media/prelim_mastershowcase_tooltips/fan_drawings.png",
+  // "rect-5": "media/prelim_mastershowcase_tooltips/mona_drawings.png",
+  // "rect-6": "media/prelim_mastershowcase_tooltips/greatWall_drawings.png",
 };
 
 const categoryLabels = [
@@ -86,6 +86,18 @@ const svgMaster = d3
   .attr("height", height + margin.top + margin.bottom)
   .append("g")
   .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+// const group1 = svgMaster
+//   .append("g")
+//   .attr("transform", "translate(0,0) scale(0.5)");
+
+// const group2 = svgMaster
+//   .append("g")
+//   .attr("transform", "translate(15,0) scale(0.5)");
+
+// const group3 = svgMaster
+//   .append("g")
+//   .attr("transform", "translate(30,0) scale(0.5)");
 
 const imageDisplay = svgMaster
   .append("image")
