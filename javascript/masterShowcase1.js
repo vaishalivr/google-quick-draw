@@ -1,8 +1,64 @@
 const [UNITLEGENDRECTWIDTH, UNITLEGENDRECTHEIGHT] = [30, 30];
+const [UNITLEGENDRECTWIDTHGRID, UNITLEGENDRECTHEIGHTGRID] = [40, 40];
 const LEGENDRECTCOUNT = 40;
 const RECTCOUNTDATA = d3.range(LEGENDRECTCOUNT);
 const RECTSPERROW = LEGENDRECTCOUNT;
-const SVGWIDTH = 1200;
+const SVGWIDTH = 1500; //1200 original
+
+const totalWidthTopRow = RECTSPERROW * UNITLEGENDRECTWIDTH;
+const totalWidthBottomRow = 20 * UNITLEGENDRECTWIDTH;
+const totalRectsWidth = LEGENDRECTCOUNT * UNITLEGENDRECTWIDTH;
+const xOffset = (SVGWIDTH - totalRectsWidth) / 2;
+
+const categoryRectBottomY = 45;
+let lastClickedCountryRect = null;
+let lastClickedCategoryRect = null;
+
+function updateCountryRects(countries) {
+  svgMaster.selectAll(".country-rect").remove();
+  svgMaster.selectAll(".country-text").remove();
+
+  const countryRectY = categoryRectBottomY + UNITLEGENDRECTHEIGHT + 600;
+
+  svgMaster
+    .selectAll(".country-rect")
+    .data(countries)
+    .enter()
+    .append("rect")
+    .attr("class", "country-rect")
+    .attr("width", UNITLEGENDRECTWIDTH)
+    .attr("height", UNITLEGENDRECTHEIGHT)
+    .attr("x", (d, i) => i * UNITLEGENDRECTWIDTH)
+    .attr("y", countryRectY)
+    .attr("fill", "white")
+    .attr("stroke", "black")
+    .on("click", function (event, d) {
+      if (lastClickedCountryRect) {
+        lastClickedCountryRect.attr("fill", "white");
+      }
+      d3.select(this).attr("fill", "#808080");
+      lastClickedCountryRect = d3.select(this);
+    });
+
+  svgMaster
+    .selectAll(".country-text")
+    .data(countries)
+    .enter()
+    .append("text")
+    .attr("class", "country-text")
+    .attr("x", (d, i) => (i + 0.5) * UNITLEGENDRECTWIDTH)
+    .attr("y", countryRectY + UNITLEGENDRECTHEIGHT + 5)
+    .attr("text-anchor", "end")
+    .attr(
+      "transform",
+      (d, i) =>
+        `rotate(-90, ${(i + 0.5) * UNITLEGENDRECTWIDTH}, ${
+          countryRectY + UNITLEGENDRECTHEIGHT + 5
+        })`
+    )
+    .attr("font-size", "10px")
+    .text((d) => d);
+}
 
 const categoryLabels = [
   { text: "Dishwasher" },
@@ -55,56 +111,84 @@ const svgMaster = d3
   .append("g")
   .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-const showcaseDrawStrokes = (data, group, index) => {
-  if (index < data.length) {
-    const stroke = data[index];
+svgMaster
+  .selectAll("rect")
+  .data(categoryLabels)
+  .enter()
+  .append("rect")
+  .attr("id", (d) => `rect-${d.text.replace(/\s+/g, "-").toLowerCase()}`)
+  .attr("width", UNITLEGENDRECTWIDTH)
+  .attr("height", UNITLEGENDRECTHEIGHT)
+  .attr("x", (d, i) => xOffset + i * UNITLEGENDRECTWIDTH)
+  .attr("y", categoryRectBottomY)
+  .attr("fill", "white")
+  .attr("stroke", "black")
+  .on("click", function (event, d) {
+    console.log(this.id);
+    if (lastClickedCategoryRect) {
+      lastClickedCategoryRect.attr("fill", "white");
+    }
+    d3.select(this).attr("fill", "#808080");
+    lastClickedCategoryRect = d3.select(this);
 
-    group
-      .append("path")
-      .attr("d", createPath(stroke))
-      .attr("fill", "none")
-      .attr("stroke", "black")
-      .attr("stroke-width", "2");
+    const category = this.id.substring(5); // Remove 'rect-' prefix
+    const countryData = mastershowcase_data[category]
+      ? Object.keys(mastershowcase_data[category])
+      : [];
+    updateCountryRects(countryData);
+  });
+// This offset is used to center the rectangles, use it to center the labels as well.
+const xOffsetLabels =
+  (SVGWIDTH - categoryLabels.length * UNITLEGENDRECTWIDTH) / 2;
+svgMaster
+  .selectAll("text")
+  .data(categoryLabels)
+  .enter()
+  .append("text")
+  .attr(
+    "x",
+    (d, i) => xOffsetLabels + i * UNITLEGENDRECTWIDTH + UNITLEGENDRECTWIDTH / 2
+  )
+  .attr("y", categoryRectBottomY + UNITLEGENDRECTHEIGHT + 15) // Adjust the Y position if necessary
+  .attr("text-anchor", "end")
+  .attr(
+    "transform",
+    (d, i) =>
+      `rotate(-90, ${
+        xOffsetLabels + i * UNITLEGENDRECTWIDTH + UNITLEGENDRECTWIDTH / 2
+      }, ${categoryRectBottomY + UNITLEGENDRECTHEIGHT + 15})`
+  )
+  .text((d) => d.text)
+  .attr("font-size", "10px")
+  .attr("fill", "black");
 
-    if (index + 1 < data.length) {
-      showcaseDrawStrokes(data, group, index + 1);
+function createGrid() {
+  const gridData = [];
+  for (let row = 0; row < 3; row++) {
+    for (let col = 0; col < RECTSPERROW; col++) {
+      gridData.push({
+        id: `rect-${row * RECTSPERROW + col}`,
+        x: col * UNITLEGENDRECTWIDTHGRID,
+        y: row * UNITLEGENDRECTHEIGHTGRID + 150,
+      });
     }
   }
-};
 
-const scaleGroup = (group) => {
-  const bbox = group.node().getBBox();
-  console.log(bbox);
-  const originalSize = bbox.width * bbox.height;
-  console.log(originalSize);
-  const requiredSize = 100 * 100;
-  return requiredSize / originalSize;
-};
+  svgMaster
+    .selectAll(".unit-legend-rect")
+    .data(gridData, (d) => d.id)
+    .join((enter) =>
+      enter
+        .append("rect")
+        .attr("class", "unit-legend-rect")
+        .attr("id", (d) => d.id)
+        .attr("x", (d) => d.x)
+        .attr("y", (d) => d.y)
+        .attr("width", UNITLEGENDRECTWIDTHGRID)
+        .attr("height", UNITLEGENDRECTHEIGHTGRID)
+        .attr("fill", "white")
+        .attr("stroke", "black")
+    );
+}
 
-const group1 = svgMaster.append("g");
-const group2 = svgMaster.append("g");
-const group3 = svgMaster.append("g");
-const group4 = svgMaster.append("g");
-const group5 = svgMaster.append("g");
-
-showcaseDrawStrokes(
-  mastershowcase_data["dishwasher"]["United States"][0]["drawing"],
-  group1,
-  0
-);
-showcaseDrawStrokes(
-  mastershowcase_data["dishwasher"]["United States"][1]["drawing"],
-  group2,
-  0
-);
-showcaseDrawStrokes(
-  mastershowcase_data["dishwasher"]["United States"][2]["drawing"],
-  group3,
-  0
-);
-
-setTimeout(() => {
-  group1.attr("transform", `translate(0,0) scale(${scaleGroup(group1)})`);
-  group2.attr("transform", `translate(60,0) scale(${scaleGroup(group2)})`);
-  group3.attr("transform", `translate(120,0) scale(${scaleGroup(group3)})`);
-}, 0);
+createGrid();
