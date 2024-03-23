@@ -1,9 +1,7 @@
-const NUMRECTSDOWN = 9;
-const NUMRECTSACROSS = 18;
-const UNITRECTWIDTH = 90;
-const UNITRECTHEIGHT = 90;
-
-let lastHighlightedRectIds = [];
+const NUMRECTSDOWN = 9; //9
+const NUMRECTSACROSS = 27; //18
+const UNITRECTWIDTH = 60; //90
+const UNITRECTHEIGHT = 60; //90
 
 const svgShortStories = d3
   .select("#shortstories-showcase")
@@ -31,61 +29,6 @@ for (let y = 0; y < NUMRECTSDOWN; y++) {
       });
   }
 }
-
-function highlightRectangles(rectIds) {
-  lastHighlightedRectIds.forEach((id) => {
-    d3.select(`#${id}`).attr("stroke", "black").attr("stroke-width", 1);
-  });
-  rectIds.forEach((id) => {
-    d3.select(`#${id}`).attr("stroke", "#ffd43c").attr("stroke-width", 6);
-  });
-  lastHighlightedRectIds = rectIds;
-}
-
-function addTextWithManualBreaks(rectId, text, targetRectIds) {
-  const lines = text.split("-");
-  const idParts = rectId.split("-");
-  const row = parseInt(idParts[1], 10);
-  const column = parseInt(idParts[2], 10);
-
-  const textX = column * UNITRECTWIDTH + UNITRECTWIDTH / 2;
-  const blockHeight = lines.length * 12;
-  let textYStart =
-    row * UNITRECTHEIGHT + (UNITRECTHEIGHT - blockHeight) / 2 + 6;
-
-  lines.forEach((line, index) => {
-    const textElement = svgShortStories.append("text");
-    textElement
-      .attr("x", textX)
-      .attr("y", textYStart + index * 12)
-      .text(line.trim())
-      .attr("font-size", "15px")
-      .attr("text-anchor", "middle")
-      .attr("dominant-baseline", "hanging")
-      .attr("id", `text-line-${index}-for-${rectId}`);
-
-    textElement.on("click", function () {
-      highlightRectangles(targetRectIds);
-    });
-  });
-
-  d3.select(`#${rectId}`).on("click", function () {
-    highlightRectangles(targetRectIds);
-  });
-}
-
-addTextWithManualBreaks("rect-1-16", "Different - kinds of - Snowflakes", [
-  "rect-0-16",
-  "rect-0-17",
-  "rect-1-17",
-  "rect-2-17",
-]);
-
-addTextWithManualBreaks(
-  "rect-3-15",
-  "Pendent vs. - Pearls kind of - Necklaces",
-  ["rect-2-14", "rect-2-15", "rect-2-16", "rect-3-16", "rect-3-17"]
-);
 
 const drawQuickDrawImage = (rectId, data) => {
   const rect = d3.select(`#${rectId}`);
@@ -118,13 +61,121 @@ const drawQuickDrawImage = (rectId, data) => {
   });
 };
 
-drawQuickDrawImage("rect-0-16", snowflake_data_1);
-drawQuickDrawImage("rect-0-17", snowflake_data_2);
-drawQuickDrawImage("rect-1-17", snowflake_data_3);
-drawQuickDrawImage("rect-2-17", snowflake_data_4);
+drawQuickDrawImage("rect-0-0", snowflake_data_1);
+drawQuickDrawImage("rect-0-1", snowflake_data_2);
+drawQuickDrawImage("rect-0-2", snowflake_data_3);
+drawQuickDrawImage("rect-1-0", snowflake_data_4);
 
 drawQuickDrawImage("rect-2-14", necklace_data_1);
 drawQuickDrawImage("rect-2-15", necklace_data_2);
 drawQuickDrawImage("rect-2-16", necklace_data_3);
 drawQuickDrawImage("rect-3-16", necklace_data_4);
 drawQuickDrawImage("rect-3-17", necklace_data_5);
+
+// const snowflakeGroup = [
+//   "rect-0-0",
+//   "rect-0-1",
+//   "rect-0-2",
+//   "rect-1-0",
+//   "rect-1-1",
+//   "rect-1-2",
+//   "rect-2-0",
+//   "rect-2-1",
+//   "rect-2-2",
+// ];
+// const necklaceGroup = [
+//   "rect-3-0",
+//   "rect-3-1",
+//   "rect-3-2",
+//   "rect-4-0",
+//   "rect-4-1",
+//   "rect-4-2",
+//   "rect-5-0",
+//   "rect-5-1",
+//   "rect-5-2",
+// ];
+// const coffeecupGroup = [
+//   "rect-6-0",
+//   "rect-6-1",
+//   "rect-6-2",
+//   "rect-7-0",
+//   "rect-7-1",
+//   "rect-7-2",
+//   "rect-8-0",
+//   "rect-8-1",
+//   "rect-8-2",
+// ];
+// const flower1Group = [
+//   "rect-0-3",
+//   "rect-0-4",
+//   "rect-0-5",
+//   "rect-1-3",
+//   "rect-1-4",
+//   "rect-1-5",
+//   "rect-2-3",
+//   "rect-2-4",
+//   "rect-2-5",
+// ];
+
+function createGroupArray(startRow, startCol, numRows, numCols) {
+  const groupArray = [];
+  for (let i = startRow; i < startRow + numRows; i++) {
+    for (let j = startCol; j < startCol + numCols; j++) {
+      groupArray.push(`rect-${i}-${j}`);
+    }
+  }
+  return groupArray;
+}
+
+const snowflakeGroup = createGroupArray(0, 0, 3, 3);
+const necklaceGroup = createGroupArray(3, 0, 3, 3);
+const coffeecupGroup = createGroupArray(6, 0, 3, 3);
+const flower1Group = createGroupArray(0, 3, 3, 3);
+const breadGroup = createGroupArray(3, 3, 3, 3);
+
+const groups = {};
+snowflakeGroup.forEach((id) => (groups[id] = snowflakeGroup));
+necklaceGroup.forEach((id) => (groups[id] = necklaceGroup));
+coffeecupGroup.forEach((id) => (groups[id] = coffeecupGroup));
+flower1Group.forEach((id) => (groups[id] = flower1Group));
+breadGroup.forEach((id) => (groups[id] = breadGroup));
+
+let lastHighlightedRectIds = [];
+
+function highlightRectangles(rectIds) {
+  d3.selectAll(".highlight-group").remove();
+  lastHighlightedRectIds.forEach((id) => {
+    d3.select(`#${id}`)
+      .attr("stroke", "black")
+      .attr("stroke-width", 1)
+      .attr("stroke-dasharray", "2");
+  });
+
+  const firstRect = d3.select(`#${rectIds[0]}`).node().getBBox();
+  const lastRect = d3
+    .select(`#${rectIds[rectIds.length - 1]}`)
+    .node()
+    .getBBox();
+
+  const groupHighlight = svgShortStories
+    .append("rect")
+    .attr("x", firstRect.x)
+    .attr("y", firstRect.y)
+    .attr("width", lastRect.x - firstRect.x + UNITRECTWIDTH)
+    .attr("height", lastRect.y - firstRect.y + UNITRECTHEIGHT)
+    .attr("class", "highlight-group")
+    .attr("stroke", "#ffd43c")
+    .attr("stroke-width", 6)
+    .attr("fill", "none");
+
+  lastHighlightedRectIds = rectIds;
+}
+
+function setupRectClickListeners() {
+  Object.keys(groups).forEach((id) => {
+    d3.select(`#${id}`).on("click", function () {
+      highlightRectangles(groups[id]);
+    });
+  });
+}
+setupRectClickListeners();

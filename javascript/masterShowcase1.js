@@ -1,194 +1,236 @@
-const [UNITLEGENDRECTWIDTH, UNITLEGENDRECTHEIGHT] = [30, 30];
-const [UNITLEGENDRECTWIDTHGRID, UNITLEGENDRECTHEIGHTGRID] = [40, 40];
-const LEGENDRECTCOUNT = 40;
-const RECTCOUNTDATA = d3.range(LEGENDRECTCOUNT);
-const RECTSPERROW = LEGENDRECTCOUNT;
-const SVGWIDTH = 1500; //1200 original
+const countries = Object.keys(
+  mastershowcase_data["dishwasher"]["unrecognized"]
+);
+console.log(countries);
 
-const totalWidthTopRow = RECTSPERROW * UNITLEGENDRECTWIDTH;
-const totalWidthBottomRow = 20 * UNITLEGENDRECTWIDTH;
-const totalRectsWidth = LEGENDRECTCOUNT * UNITLEGENDRECTWIDTH;
-const xOffset = (SVGWIDTH - totalRectsWidth) / 2;
+//////////CODE//////////
+const mastershowcaseSvgObj = { width: window.innerWidth - 10, height: 980 };
 
-const categoryRectBottomY = 45;
-let lastClickedCountryRect = null;
-let lastClickedCategoryRect = null;
+const categoryObj = {
+  count: Object.keys(mastershowcase_data).length,
+  unitRectWidth: 30,
+  unitRectHeight: 30,
+  nameSpace: 100, //from top of svg
+  imagesDrawn: false,
+  rectBottom: function () {
+    return this.nameSpace + this.unitRectHeight;
+  },
+  rectLeft: function () {
+    return (
+      mastershowcaseSvgObj.width / 2 - (this.count * this.unitRectWidth) / 2
+    );
+  },
+};
 
-function updateCountryRects(countries) {
-  svgMaster.selectAll(".country-rect").remove();
-  svgMaster.selectAll(".country-text").remove();
+const recognizedDisplayObj = {
+  unitWidth: 60,
+  unitHeight: 60,
+  numDoodles: 24,
+  totalWidth: function () {
+    return this.unitWidth * this.numDoodles;
+  },
+};
 
-  const countryRectY = categoryRectBottomY + UNITLEGENDRECTHEIGHT + 600;
+const gridObj = {
+  gridRows: countries.length,
+  gridCols: 24,
+  unitWidth: 60,
+  unitHeight: 60,
+  countries: countries,
+};
+gridObj.xOffset =
+  (mastershowcaseSvgObj.width - gridObj.gridCols * gridObj.unitWidth) / 2;
+gridObj.yOffset =
+  (mastershowcaseSvgObj.height - gridObj.gridRows * gridObj.unitHeight) / 2;
 
-  svgMaster
-    .selectAll(".country-rect")
-    .data(countries)
-    .enter()
-    .append("rect")
-    .attr("class", "country-rect")
-    .attr("width", UNITLEGENDRECTWIDTH)
-    .attr("height", UNITLEGENDRECTHEIGHT)
-    .attr("x", (d, i) => i * UNITLEGENDRECTWIDTH)
-    .attr("y", countryRectY)
-    .attr("fill", "white")
-    .attr("stroke", "black")
-    .on("click", function (event, d) {
-      if (lastClickedCountryRect) {
-        lastClickedCountryRect.attr("fill", "white");
-      }
-      d3.select(this).attr("fill", "#808080");
-      lastClickedCountryRect = d3.select(this);
-    });
+const drawImageInRect = (rectId, data) => {
+  //console.log(data["drawing"]);
+  //console.log(rectId);
+  const rect = d3.select(`#${rectId}`);
+  rect.selectAll("*").remove(); //TO DO : check
+  const rectX = +rect.attr("x");
+  const rectY = +rect.attr("y");
+  const rectWidth = gridObj.unitWidth * 0.8;
+  const rectHeight = gridObj.unitWidth * 0.8;
+  const marginX = (gridObj.unitWidth - rectWidth) / 2;
+  const marginY = (gridObj.unitWidth - rectHeight) / 2;
 
-  svgMaster
-    .selectAll(".country-text")
-    .data(countries)
-    .enter()
-    .append("text")
-    .attr("class", "country-text")
-    .attr("x", (d, i) => (i + 0.5) * UNITLEGENDRECTWIDTH)
-    .attr("y", countryRectY + UNITLEGENDRECTHEIGHT + 5)
-    .attr("text-anchor", "end")
-    .attr(
-      "transform",
-      (d, i) =>
-        `rotate(-90, ${(i + 0.5) * UNITLEGENDRECTWIDTH}, ${
-          countryRectY + UNITLEGENDRECTHEIGHT + 5
-        })`
-    )
-    .attr("font-size", "10px")
-    .text((d) => d);
-}
+  const group = gridGroup
+    .append("g")
+    .attr("transform", `translate(${rectX + marginX}, ${rectY + marginY})`);
 
-const categoryLabels = [
-  { text: "Dishwasher" },
-  { text: "Blackberry" },
-  { text: "Cookies" },
-  { text: "Fan" },
-  { text: "Mona Lisa" },
-  { text: "Great Wall of China" },
-  { text: "Nail" },
-  { text: "Beach" },
-  { text: "Coffee Cup" },
-  { text: "Dresser" },
-  { text: "Mail Box" },
-  { text: "House" },
-  { text: "Ice Cream" },
-  { text: "Hand" },
-  { text: "Fence" },
-  { text: "Dumb Bell" },
-  { text: "Suitcase" },
-  { text: "Smiley Face" },
-  { text: "Sink" },
-  { text: "Camera" },
-  { text: "Diving Board" },
-  { text: "Motorbike" },
-  { text: "Marker" },
-  { text: "Police Car" },
-  { text: "Paint Brush" },
-  { text: "Necklace" },
-  { text: "Passport" },
-  { text: "River" },
-  { text: "Shoe" },
-  { text: "Whale" },
-  { text: "Tree" },
-  { text: "Teddy Bear" },
-  { text: "Vase" },
-  { text: "Telephone" },
-  { text: "Washing Machine" },
-  { text: "Wristwatch" },
-  { text: "Umbrella" },
-  { text: "Swing Set" },
-  { text: "Sweater" },
-  { text: "T-shirt" },
-];
+  const scaleX = d3.scaleLinear().domain([0, 255]).range([0, rectWidth]);
+  const scaleY = d3.scaleLinear().domain([0, 255]).range([0, rectHeight]);
 
-const svgMaster = d3
+  data["drawing"].forEach((stroke) => {
+    const scaledStroke = [
+      stroke[0].map((x) => scaleX(x)),
+      stroke[1].map((y) => scaleY(y)),
+    ];
+
+    group
+      .append("path")
+      .attr("d", createPath(scaledStroke))
+      .attr("fill", "none")
+      .attr("stroke", "black")
+      .attr("stroke-width", "1");
+  });
+};
+
+let activeLine = null;
+
+//const canadaRects = Array.from({ length: 24 }, (_, i) => `rect0${i}`);
+//const polandRects = Array.from({ length: 24 }, (_, i) => `rect1${i}`);
+
+const mastershowcaseSvg = d3
   .select("#master-showcase")
   .append("svg")
-  .attr("width", SVGWIDTH + margin.left + margin.right)
-  .attr("height", height + margin.top + margin.bottom)
+  .attr("width", mastershowcaseSvgObj.width)
+  .attr("height", mastershowcaseSvgObj.height);
+
+const categoryRectGroup = mastershowcaseSvg
   .append("g")
-  .attr("transform", `translate(${margin.left}, ${margin.top})`);
-
-svgMaster
-  .selectAll("rect")
-  .data(categoryLabels)
-  .enter()
-  .append("rect")
-  .attr("id", (d) => `rect-${d.text.replace(/\s+/g, "-").toLowerCase()}`)
-  .attr("width", UNITLEGENDRECTWIDTH)
-  .attr("height", UNITLEGENDRECTHEIGHT)
-  .attr("x", (d, i) => xOffset + i * UNITLEGENDRECTWIDTH)
-  .attr("y", categoryRectBottomY)
-  .attr("fill", "white")
-  .attr("stroke", "black")
-  .on("click", function (event, d) {
-    console.log(this.id);
-    if (lastClickedCategoryRect) {
-      lastClickedCategoryRect.attr("fill", "white");
-    }
-    d3.select(this).attr("fill", "#808080");
-    lastClickedCategoryRect = d3.select(this);
-
-    const category = this.id.substring(5); // Remove 'rect-' prefix
-    const countryData = mastershowcase_data[category]
-      ? Object.keys(mastershowcase_data[category])
-      : [];
-    updateCountryRects(countryData);
+  .attr("transform", function () {
+    return `translate(${categoryObj.rectLeft()}, ${categoryObj.nameSpace})`;
   });
-// This offset is used to center the rectangles, use it to center the labels as well.
-const xOffsetLabels =
-  (SVGWIDTH - categoryLabels.length * UNITLEGENDRECTWIDTH) / 2;
-svgMaster
-  .selectAll("text")
-  .data(categoryLabels)
-  .enter()
-  .append("text")
-  .attr(
-    "x",
-    (d, i) => xOffsetLabels + i * UNITLEGENDRECTWIDTH + UNITLEGENDRECTWIDTH / 2
-  )
-  .attr("y", categoryRectBottomY + UNITLEGENDRECTHEIGHT + 15) // Adjust the Y position if necessary
-  .attr("text-anchor", "end")
+
+const recognizedDisplayGroup = mastershowcaseSvg
+  .append("g")
+  .attr("transform", function () {
+    return `translate(${
+      (mastershowcaseSvgObj.width - recognizedDisplayObj.totalWidth()) / 2
+    }, ${categoryObj.nameSpace})`;
+  });
+
+const gridGroup = mastershowcaseSvg
+  .append("g")
   .attr(
     "transform",
-    (d, i) =>
-      `rotate(-90, ${
-        xOffsetLabels + i * UNITLEGENDRECTWIDTH + UNITLEGENDRECTWIDTH / 2
-      }, ${categoryRectBottomY + UNITLEGENDRECTHEIGHT + 15})`
-  )
-  .text((d) => d.text)
-  .attr("font-size", "10px")
-  .attr("fill", "black");
+    `translate(${gridObj.xOffset}, ${gridObj.yOffset + 105 + 15})`
+  );
 
-function createGrid() {
-  const gridData = [];
-  for (let row = 0; row < 3; row++) {
-    for (let col = 0; col < RECTSPERROW; col++) {
-      gridData.push({
-        id: `rect-${row * RECTSPERROW + col}`,
-        x: col * UNITLEGENDRECTWIDTHGRID,
-        y: row * UNITLEGENDRECTHEIGHTGRID + 150,
+for (let row = 0; row < gridObj.gridRows; row++) {
+  gridGroup
+    .append("text")
+    .text(countries[row])
+    .attr("text-anchor", "end")
+    .attr("x", -30)
+    .attr("y", row * gridObj.unitWidth + gridObj.unitHeight / 2);
+
+  for (let col = 0; col < gridObj.gridCols; col++) {
+    gridGroup
+      .append("rect")
+      .attr("x", col * gridObj.unitWidth)
+      .attr("y", row * gridObj.unitHeight)
+      .attr("width", gridObj.unitWidth)
+      .attr("height", gridObj.unitHeight)
+      .attr("fill", "white")
+      // .attr("stroke", "black")
+      .attr("id", `rect${row}-${col}`)
+      // .on("click", function () {
+      //   console.log(this.id);
+      // })
+      .on("mouseover", function () {
+        console.log("this");
+        d3.select(this)
+          .attr("stroke", "#ffd43c")
+          .attr("rx", 6)
+          .attr("ry", 6)
+          .attr("stroke-width", "3");
+      })
+      .on("mouseout", function () {
+        d3.select(this)
+          // .transition()
+          // .duration(2100)
+          .attr("stroke", "none")
+          .attr("stroke-width", "0");
       });
-    }
   }
-
-  svgMaster
-    .selectAll(".unit-legend-rect")
-    .data(gridData, (d) => d.id)
-    .join((enter) =>
-      enter
-        .append("rect")
-        .attr("class", "unit-legend-rect")
-        .attr("id", (d) => d.id)
-        .attr("x", (d) => d.x)
-        .attr("y", (d) => d.y)
-        .attr("width", UNITLEGENDRECTWIDTHGRID)
-        .attr("height", UNITLEGENDRECTHEIGHTGRID)
-        .attr("fill", "white")
-        .attr("stroke", "black")
-    );
 }
 
-createGrid();
+for (let i = 0; i < categoryObj.count; i++) {
+  const textX = i * categoryObj.unitRectWidth + categoryObj.unitRectWidth / 2;
+  const text = Object.keys(mastershowcase_data)[i];
+
+  categoryRectGroup
+    .append("text")
+    .attr("x", textX)
+    .attr("y", 0)
+    .text(text)
+    .attr("id", "rect-" + text)
+    .attr("dominant-baseline", "hanging")
+    .attr("transform", `rotate(-90, ${textX}, 0)`);
+
+  categoryRectGroup
+    .append("rect")
+    .attr("x", i * categoryObj.unitRectWidth)
+    .attr("y", 0)
+    .attr("width", categoryObj.unitRectWidth) // -3 if padding needed
+    .attr("height", categoryObj.unitRectHeight) // -3 if padding needed
+    .attr("stroke", "black")
+    .attr("fill", "white")
+    .attr("id", "rect-" + text)
+    .on("click", function () {
+      //console.log("here");
+      const category = this.id.substring(5);
+      if (!categoryObj.imagesDrawn) {
+        console.log(category);
+        for (let i = 0; i < countries.length; i++) {
+          //console.log(countries[i]);
+          for (
+            let j = 0;
+            j <
+            mastershowcase_data[category]["unrecognized"][countries[i]].length;
+            j++
+          ) {
+            drawImageInRect(
+              `rect${i}-${j}`,
+              mastershowcase_data[category]["unrecognized"][countries[i]][j]
+            );
+          }
+        }
+        categoryObj.imagesDrawn = true;
+      }
+
+      if (activeLine) {
+        activeLine.remove();
+      }
+
+      const lineX = i * categoryObj.unitRectWidth;
+      activeLine = mastershowcaseSvg
+        .append("line")
+        .attr("x1", categoryObj.rectLeft() + lineX)
+        .attr("y1", categoryObj.rectBottom() + 9) // extra margin
+        .attr("x2", categoryObj.rectLeft() + lineX + categoryObj.unitRectWidth)
+        .attr("y2", categoryObj.rectBottom() + 9)
+        .attr("class", "highlighted-line")
+        .style("stroke", "black")
+        .style("stroke-width", 2);
+    });
+}
+
+for (let i = 0; i < recognizedDisplayObj.numDoodles; i++) {
+  recognizedDisplayGroup
+    .append("rect")
+    .attr("x", i * recognizedDisplayObj.unitWidth)
+    .attr("y", recognizedDisplayObj.unitWidth) //down by 30
+    .attr("width", recognizedDisplayObj.unitWidth)
+    .attr("height", recognizedDisplayObj.unitHeight)
+    .attr("stroke", "black")
+    .attr("fill", "white")
+    .attr("id", "recgRect-" + (i + 1)) //adding 1
+    .on("click", function () {
+      console.log(this.id);
+    });
+}
+
+// CONSTRUCTION LINE //
+// const centerLineX = mastershowcaseSvgObj.width / 2;
+// mastershowcaseSvg
+//   .append("line")
+//   .attr("x1", centerLineX)
+//   .attr("y1", 0)
+//   .attr("x2", centerLineX)
+//   .attr("y2", mastershowcaseSvgObj.height)
+//   .style("stroke", "black")
+//   .style("stroke-width", 2);
