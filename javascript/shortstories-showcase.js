@@ -14,8 +14,8 @@ const svgShortStories = d3
 
 for (let y = 0; y < NUMRECTSDOWN; y++) {
   for (let x = 0; x < NUMRECTSACROSS; x++) {
-    let additionalXMargin = Math.floor(x / 3) * SHOWCASEMARGIN;
-    let additionalYMargin = Math.floor(y / 3) * SHOWCASEMARGIN;
+    //let additionalXMargin = Math.floor(x / 3) * SHOWCASEMARGIN;
+    //let additionalYMargin = Math.floor(y / 3) * SHOWCASEMARGIN;
 
     svgShortStories
       .append("rect")
@@ -347,31 +347,97 @@ function createGroupArray(startRow, startCol, numRows, numCols) {
   return groupArray;
 }
 
-const snowflakeGroup = createGroupArray(0, 0, 3, 3);
-const necklaceGroup = createGroupArray(3, 0, 3, 3);
+const mugGroup = createGroupArray(0, 0, 3, 3);
+const cupGroup = createGroupArray(3, 0, 3, 3);
 const coffeecupGroup = createGroupArray(6, 0, 3, 3);
-const flower1Group = createGroupArray(0, 3, 3, 3);
-const breadGroup = createGroupArray(3, 3, 3, 3);
-const fenceGroup = createGroupArray(6, 3, 3, 3);
-const leafGroup = createGroupArray(0, 6, 3, 3);
-const housePlantGroup = createGroupArray(0, 6, 3, 3);
-const featherGroup = createGroupArray(3, 6, 3, 3);
+
+const donutGroup = createGroupArray(0, 3, 3, 3);
+const flyingSaucerGroup = createGroupArray(3, 3, 3, 3);
+const hatGroup = createGroupArray(6, 3, 3, 3);
+
+const pondGroup = createGroupArray(0, 6, 3, 3);
+const riverGroup = createGroupArray(3, 6, 3, 3);
+const oceanGroup = createGroupArray(6, 6, 3, 3);
+
+const crayonGroup = createGroupArray(0, 9, 3, 3);
+const markerGroup = createGroupArray(3, 9, 3, 3);
+const pencilGroup = createGroupArray(6, 9, 3, 3);
+
+const smileyGroup = createGroupArray(0, 12, 3, 3);
+const faceGroup = createGroupArray(3, 12, 3, 3);
+const monaGroup = createGroupArray(6, 12, 3, 3);
+
+const nailGroup = createGroupArray(0, 15, 3, 3);
+const matchesGroup = createGroupArray(0, 18, 3, 3);
+
+const calculatorGroup = createGroupArray(3, 15, 3, 3);
+const cellphoneGroup = createGroupArray(3, 18, 3, 3);
 
 const groups = {};
-snowflakeGroup.forEach((id) => (groups[id] = snowflakeGroup));
-necklaceGroup.forEach((id) => (groups[id] = necklaceGroup));
-coffeecupGroup.forEach((id) => (groups[id] = coffeecupGroup));
-flower1Group.forEach((id) => (groups[id] = flower1Group));
-breadGroup.forEach((id) => (groups[id] = breadGroup));
-fenceGroup.forEach((id) => (groups[id] = fenceGroup));
-leafGroup.forEach((id) => (groups[id] = leafGroup));
-housePlantGroup.forEach((id) => (groups[id] = housePlantGroup));
-featherGroup.forEach((id) => (groups[id] = featherGroup));
+mugGroup.forEach(
+  (id) => (groups[id] = mugGroup.concat(cupGroup, coffeecupGroup))
+);
+cupGroup.forEach(
+  (id) => (groups[id] = mugGroup.concat(cupGroup, coffeecupGroup))
+);
+coffeecupGroup.forEach(
+  (id) => (groups[id] = mugGroup.concat(cupGroup, coffeecupGroup))
+);
+
+donutGroup.forEach(
+  (id) => (groups[id] = donutGroup.concat(flyingSaucerGroup, hatGroup))
+);
+flyingSaucerGroup.forEach(
+  (id) => (groups[id] = donutGroup.concat(flyingSaucerGroup, hatGroup))
+);
+hatGroup.forEach(
+  (id) => (groups[id] = donutGroup.concat(flyingSaucerGroup, hatGroup))
+);
+
+pondGroup.forEach(
+  (id) => (groups[id] = pondGroup.concat(riverGroup, oceanGroup))
+);
+riverGroup.forEach(
+  (id) => (groups[id] = pondGroup.concat(riverGroup, oceanGroup))
+);
+oceanGroup.forEach(
+  (id) => (groups[id] = pondGroup.concat(riverGroup, oceanGroup))
+);
+
+crayonGroup.forEach(
+  (id) => (groups[id] = crayonGroup.concat(markerGroup, pencilGroup))
+);
+markerGroup.forEach(
+  (id) => (groups[id] = crayonGroup.concat(markerGroup, pencilGroup))
+);
+pencilGroup.forEach(
+  (id) => (groups[id] = crayonGroup.concat(markerGroup, pencilGroup))
+);
+
+smileyGroup.forEach(
+  (id) => (groups[id] = smileyGroup.concat(faceGroup, monaGroup))
+);
+faceGroup.forEach(
+  (id) => (groups[id] = smileyGroup.concat(faceGroup, monaGroup))
+);
+monaGroup.forEach(
+  (id) => (groups[id] = smileyGroup.concat(faceGroup, monaGroup))
+);
+
+nailGroup.forEach((id) => (groups[id] = smileyGroup.concat(matchesGroup)));
+matchesGroup.forEach((id) => (groups[id] = smileyGroup.concat(matchesGroup)));
+
+calculatorGroup.forEach(
+  (id) => (groups[id] = calculatorGroup.concat(cellphoneGroup))
+);
+cellphoneGroup.forEach(
+  (id) => (groups[id] = calculatorGroup.concat(cellphoneGroup))
+);
 
 let lastHighlightedRectIds = [];
 
 function highlightRectangles(rectIds) {
-  d3.selectAll(".highlight-group").remove();
+  d3.selectAll(".highlight-group, .separator-line").remove();
   lastHighlightedRectIds.forEach((id) => {
     d3.select(`#${id}`)
       .attr("stroke", "black")
@@ -385,7 +451,7 @@ function highlightRectangles(rectIds) {
     .node()
     .getBBox();
 
-  const groupHighlight = svgShortStories
+  svgShortStories
     .append("rect")
     .attr("x", firstRect.x)
     .attr("y", firstRect.y)
@@ -395,6 +461,18 @@ function highlightRectangles(rectIds) {
     .attr("stroke", "#ffd43c")
     .attr("stroke-width", 6)
     .attr("fill", "none");
+
+  [3, 6].forEach((row) => {
+    svgShortStories
+      .append("line")
+      .attr("x1", firstRect.x)
+      .attr("y1", row * UNITRECTHEIGHT)
+      .attr("x2", lastRect.x + UNITRECTWIDTH)
+      .attr("y2", row * UNITRECTHEIGHT)
+      .attr("stroke", "#ffd43c")
+      .attr("stroke-width", 6)
+      .attr("class", "separator-line");
+  });
 
   lastHighlightedRectIds = rectIds;
 }
@@ -407,3 +485,49 @@ function setupRectClickListeners() {
   });
 }
 setupRectClickListeners();
+
+function highlightTwoGroupRectangles(rectIdsGroup1, rectIdsGroup2) {
+  d3.selectAll(".highlight-group, .highlight-line").remove();
+  lastHighlightedRectIds.forEach((id) => {
+    d3.select(`#${id}`)
+      .attr("stroke", "black")
+      .attr("stroke-width", 1)
+      .attr("stroke-dasharray", "2");
+  });
+
+  highlightGroup(rectIdsGroup1, "#ffd43c");
+  highlightGroup(rectIdsGroup2, "#ffd43c");
+
+  lastHighlightedRectIds = rectIdsGroup1.concat(rectIdsGroup2);
+}
+
+function highlightGroup(rectIds, highlightColor) {
+  const firstRect = d3.select(`#${rectIds[0]}`).node().getBBox();
+  const lastRect = d3
+    .select(`#${rectIds[rectIds.length - 1]}`)
+    .node()
+    .getBBox();
+
+  svgShortStories
+    .append("rect")
+    .attr("x", firstRect.x)
+    .attr("y", firstRect.y)
+    .attr("width", lastRect.x - firstRect.x + UNITRECTWIDTH)
+    .attr("height", lastRect.y - firstRect.y + UNITRECTHEIGHT)
+    .attr("class", "highlight-group")
+    .attr("stroke", highlightColor)
+    .attr("stroke-width", 6)
+    .attr("fill", "none");
+}
+
+function setupRectClickListenersForTwoGroups(group1, group2) {
+  const allGroupIds = group1.concat(group2);
+  allGroupIds.forEach((id) => {
+    d3.select(`#${id}`).on("click", function () {
+      highlightTwoGroupRectangles(group1, group2);
+    });
+  });
+}
+
+setupRectClickListenersForTwoGroups(nailGroup, matchesGroup);
+setupRectClickListenersForTwoGroups(calculatorGroup, cellphoneGroup);
